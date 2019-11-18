@@ -9,17 +9,24 @@ port = 'COM3'
 ser = serial.Serial(port, timeout=1, baudrate=9600)  # or whatever port you need
 
 
-def getc(size, timeout=1):
+def getc(size, timeout=2):
+    toutCnt = 0
+    toutCntMax = timeout*10
     while ser.in_waiting == 0:
+        if toutCnt > toutCntMax:
+            print('timeout')
+        else:
+            toutCnt +=1
+            time.sleep(0.1)
         pass
     ret = ser.read(size)
     return ret or None
 
 
-def putc(data, timeout=1):
+def putc(data, timeout=2):
     ret = ser.write(data)  # note that this ignores the timeout
     ser.flush()
-    return ret
+    return ret or None
 
 
 modem = XMODEM(getc, putc)
